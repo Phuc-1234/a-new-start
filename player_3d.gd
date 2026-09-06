@@ -2,6 +2,8 @@ extends CharacterBody3D
 
 @export var speed: float = 5.0
 
+@onready var trail_particles: CPUParticles3D = $TrailParticles
+
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -26,3 +28,6 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0.0, speed)
 
 	move_and_slide()
+
+	if trail_particles:
+		trail_particles.emitting = velocity.length_squared() > 0.1

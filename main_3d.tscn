@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://player_3d.gd" id="1_script"]
 
@@ -23,6 +23,18 @@ background_mode = 1
 background_color = Color(0.18, 0.22, 0.28, 1.0)
 ambient_light_source = 2
 ambient_light_color = Color(0.4, 0.4, 0.4, 1.0)
+
+[sub_resource type="Gradient" id="Gradient_prismatic"]
+offsets = PackedFloat32Array(0, 0.17, 0.33, 0.5, 0.67, 0.83, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0.5, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_particle"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_particle"]
+material = SubResource("StandardMaterial3D_particle")
+size = Vector3(0.1, 0.1, 0.1)
 
 [node name="Main3D" type="Node3D"]
 
@@ -54,3 +66,23 @@ shape = SubResource("BoxShape3D_player")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
 mesh = SubResource("BoxMesh_player")
+
+[node name="TrailParticles" type="CPUParticles3D" parent="Player"]
+emitting = false
+amount = 60
+lifetime = 0.7
+local_coords = false
+mesh = SubResource("BoxMesh_particle")
+emission_shape = 1
+emission_sphere_radius = 0.6
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 1.2, 0)
+initial_velocity_min = 1.2
+initial_velocity_max = 2.8
+damping_min = 1.5
+damping_max = 2.5
+scale_amount_min = 0.4
+scale_amount_max = 1.0
+color_ramp = SubResource("Gradient_prismatic")
+color_initial_ramp = SubResource("Gradient_prismatic")
