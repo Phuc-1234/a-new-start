@@ -1,3 +1,4 @@
+@tool
 extends GLTFDocumentExtension
 
 const vrm_constants_class = preload("../vrm_constants.gd")
@@ -56,8 +57,9 @@ func _create_meta(root_node: Node, animplayer: AnimationPlayer, vrm_extension: D
 		vrm_meta.contact_information = vrm_extension["meta"].get("contactInformation", "")
 		vrm_meta.references = PackedStringArray(vrm_extension["meta"].get("references", []))
 		var tex: int = vrm_extension["meta"].get("thumbnailImage", -1)
-		if tex >= 0:
-			vrm_meta.thumbnail_image = gstate.get_images()[tex]
+		var images = gstate.get_images()
+		if tex >= 0 and tex < images.size():
+			vrm_meta.thumbnail_image = images[tex]
 		var avatar_permission_map = {"": "", "onlyAuthor": "OnlyAuthor", "onlySeparatelyLicensedPerson": "ExplicitlyLicensedPerson", "everyone": "Everyone"}
 		vrm_meta.allowed_user_name = avatar_permission_map[vrm_extension["meta"].get("avatarPermission", "")]
 		vrm_meta.violent_usage = "Allow" if vrm_extension["meta"].get("allowExcessivelyViolentUsage", false) else "Disallow"
@@ -378,7 +380,9 @@ func _create_animation_player(animplayer: AnimationPlayer, vrm_extension: Dictio
 	for i in range(meshes.size()):
 		var gltfmesh: GLTFMesh = meshes[i]
 		for j in range(gltfmesh.mesh.get_surface_count()):
-			material_idx_to_mesh_and_surface_idx[material_to_idx[gltfmesh.mesh.get_surface_material(j)]] = [i, j]
+			var mat = gltfmesh.mesh.get_surface_material(j)
+			if material_to_idx.has(mat):
+				material_idx_to_mesh_and_surface_idx[material_to_idx[mat]] = [i, j]
 
 	for i in range(nodes.size()):
 		var gltfnode: GLTFNode = nodes[i]

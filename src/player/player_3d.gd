@@ -6,12 +6,22 @@ extends CharacterBody3D
 @export var kick_force: float = 14.0
 @export var push_force: float = 3.0
 @export var windup_time: float = 0.5
+@export var wind_direction: Vector3 = Vector3(1.0, 0.0, -0.5).normalized()
+@export var wind_strength: float = 4.5
+@export var flutter_strength: float = 3.2
+@export var flutter_frequency: float = 5.5
+
+@export_group("Skirt Physics")
+@export var skirt_stiffness: float = 3.5
+@export var skirt_drag: float = 0.85
+@export var skirt_gravity: float = 2.5
 
 @onready var trail_particles: CPUParticles3D = get_node_or_null("TrailParticles")
 @onready var anim_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
 @onready var anim_tree: AnimationTree = get_node_or_null("AnimationTree")
 @onready var anim_playback: AnimationNodeStateMachinePlayback = anim_tree.get("parameters/playback") if anim_tree else null
 @onready var punch_hitbox: Area3D = get_node_or_null("PunchHitbox")
+@onready var model_node: Node3D = get_node_or_null("Model")
 
 var _hit_bodies_this_attack: Array[RigidBody3D] = []
 var _is_attacking: bool = false
@@ -48,6 +58,26 @@ func _ready() -> void:
 				punch_node.timeline_length = _punch_duration
 				punch_node.stretch_time_scale = true
 		anim_tree.active = true
+	_configure_skirt_physics()
+
+
+func _configure_skirt_physics() -> void:
+	if not model_node:
+		return
+	var secondary := model_node.get_node_or_null("secondary")
+	if not secondary or not "spring_bones" in secondary:
+		return
+	for sb in secondary.spring_bones:
+		var is_skirt: bool = sb.comment.to_lower().contains("skirt")
+		if not is_skirt:
+			for joint in sb.joint_nodes:
+				if joint.to_lower().contains("skirt"):
+					is_skirt = true
+					break
+		if is_skirt:
+			sb.stiffness_scale = skirt_stiffness
+			sb.drag_force_scale = skirt_drag
+			sb.gravity_scale = skirt_gravity
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -135,6 +165,21 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0.0, speed)
 
 	move_and_slide()
+
+	# Apply environmental wind and movement inertia to hair/skirt (VRM SpringBones)
+	if model_node:
+		var time_sec := Time.get_ticks_msec() * 0.001
+		var gust := sin(time_sec * 3.0) * 1.0 + sin(time_sec * 7.1) * 0.5
+		var flutter_phase := time_sec * flutter_frequency
+		var flutter_y := (sin(flutter_phase) * 0.7 + sin(flutter_phase * 2.13) * 0.3) * flutter_strength
+		var lateral_flutter := cos(flutter_phase * 0.85) * (flutter_strength * 0.25)
+		var cross_dir := wind_direction.cross(Vector3.UP).normalized()
+		var flutter := Vector3.UP * flutter_y + cross_dir * lateral_flutter
+		var world_wind := wind_direction * (wind_strength + gust) + flutter
+		var effective_wind := world_wind - velocity * 0.25
+		var local_wind: Vector3 = model_node.global_transform.basis.inverse() * effective_wind
+		if "springbone_add_force" in model_node:
+			model_node.springbone_add_force = local_wind
 
 	# Push rigid bodies during movement contact
 	for i in get_slide_collision_count():

@@ -1,3 +1,4 @@
+@tool
 extends GLTFDocumentExtension
 
 const vrm_constants_class = preload("../vrm_constants.gd")
@@ -36,11 +37,8 @@ func _adjust_magnitude(pfa: PackedFloat64Array, scale: float):
 func _parse_secondary_node(secondary_node: Node, vrm_extension: Dictionary, gstate: GLTFState) -> void:
 	var nodes = gstate.get_nodes()
 	var skeletons = gstate.get_skeletons()
-	var skeleton: Skeleton3D = null
-	if secondary_node.owner == null:
-		skeleton = secondary_node.get_parent().get_node("%GeneralSkeleton")
-	else:
-		skeleton = secondary_node.owner.get_node("%GeneralSkeleton")
+	var root_for_skel: Node3D = secondary_node.owner if secondary_node.owner != null else secondary_node.get_parent()
+	var skeleton: Skeleton3D = _get_humanoid_skel(root_for_skel)
 
 	var colliders: Array[vrm_collider] = []
 	var collider_groups: Array[vrm_collider_group] = []
