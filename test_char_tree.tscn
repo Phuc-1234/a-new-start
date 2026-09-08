@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://dldtu2wsn0bw6"]
+
+[ext_resource type="Script" path="res://player_3d.gd" id="1_tjw88"]
+[ext_resource type="PackedScene" path="res://models/first-human.vrm" id="2_k1jse"]
+[ext_resource type="AnimationLibrary" path="res://models/Bouncing Fight Idle.fbx" id="3_3msf2"]
+[ext_resource type="AnimationLibrary" path="res://models/Walking.fbx" id="4_tn3tt"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_char"]
+radius = 0.3
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_particle"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_particle"]
+material = SubResource("StandardMaterial3D_particle")
+size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="Gradient" id="Gradient_prismatic"]
+offsets = PackedFloat32Array(0, 0.17, 0.33, 0.5, 0.67, 0.83, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0.5, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0)
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jdejk"]
+animation = &"idle/mixamo_com"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e8ufi"]
+animation = &"walk/mixamo_com"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_h2wlk"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ig46c"]
+xfade_time = 0.25
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_l17gk"]
+xfade_time = 0.25
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ujkyb"]
+states/Idle/node = SubResource("AnimationNodeAnimation_jdejk")
+states/Idle/position = Vector2(0, 0)
+states/Walk/node = SubResource("AnimationNodeAnimation_e8ufi")
+states/Walk/position = Vector2(0, 0)
+transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition_h2wlk"), "Idle", "Walk", SubResource("AnimationNodeStateMachineTransition_ig46c"), "Walk", "Idle", SubResource("AnimationNodeStateMachineTransition_l17gk")]
+
+[node name="Character" type="CharacterBody3D" unique_id=1409054364]
+script = ExtResource("1_tjw88")
+
+[node name="Model" parent="." unique_id=1624733011 instance=ExtResource("2_k1jse")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1266326523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_char")
+
+[node name="TrailParticles" type="CPUParticles3D" parent="." unique_id=985818527]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+emitting = false
+amount = 60
+lifetime = 0.7
+mesh = SubResource("BoxMesh_particle")
+emission_shape = 1
+emission_sphere_radius = 0.4
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 1.2, 0)
+initial_velocity_min = 1.2
+initial_velocity_max = 2.8
+damping_min = 1.5
+damping_max = 2.5
+scale_amount_min = 0.4
+color_ramp = SubResource("Gradient_prismatic")
+color_initial_ramp = SubResource("Gradient_prismatic")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1138995163]
+root_node = NodePath("../Model")
+libraries/idle = ExtResource("3_3msf2")
+libraries/walk = ExtResource("4_tn3tt")
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=710397132]
+tree_root = SubResource("AnimationNodeStateMachine_ujkyb")

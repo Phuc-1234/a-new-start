@@ -1,0 +1,227 @@
+[gd_scene format=3 uid="uid://voqrpm5h7csr"]
+
+[ext_resource type="PackedScene" uid="uid://bq7vw18k2h7xm" path="res://src/world/arena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://bc4be0mkujrd1" path="res://src/player/character.tscn" id="2_character"]
+[ext_resource type="Script" uid="uid://bob04n4xouthm" path="res://src/player/camera_follow.gd" id="3_camera"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cube"]
+albedo_color = Color(1, 0.55, 0.15, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_cube"]
+material = SubResource("StandardMaterial3D_cube")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cube"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyan"]
+albedo_color = Color(0.15, 0.75, 0.95, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
+albedo_color = Color(0.95, 0.22, 0.25, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_purple"]
+albedo_color = Color(0.65, 0.25, 0.95, 1)
+roughness = 0.35
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_large_cube"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_large_cyan"]
+material = SubResource("StandardMaterial3D_cyan")
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_large_red"]
+material = SubResource("StandardMaterial3D_red")
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_large_purple"]
+material = SubResource("StandardMaterial3D_purple")
+size = Vector3(0.9, 0.9, 0.9)
+
+[node name="Main3D" type="Node3D" unique_id=1225091463]
+
+[node name="Arena" parent="." instance=ExtResource("1_arena")]
+
+[node name="Character" parent="." unique_id=416869356 instance=ExtResource("2_character")]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1585369404]
+transform = Transform3D(1, 0, 0, 0, 0.9396926, 0.34202012, 0, -0.34202012, 0.9396926, 0, 1.5, 1.3)
+near = 0.035
+script = ExtResource("3_camera")
+offset = Vector3(0, 1.5, 1.3)
+
+[node name="CubeStack" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.5)
+
+[node name="Cube1" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.26, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube1"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube1"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Cube2" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube2"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube2"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Cube3" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.26, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube3"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube3"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Cube4" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 0.78, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube4"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube4"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Cube5" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.78, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube5"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube5"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Cube6" type="RigidBody3D" parent="CubeStack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mass = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CubeStack/Cube6"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CubeStack/Cube6"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="LargePileLeft" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, -2)
+
+[node name="CubeL1" type="RigidBody3D" parent="LargePileLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileLeft/CubeL1"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileLeft/CubeL1"]
+mesh = SubResource("BoxMesh_large_cyan")
+
+[node name="CubeL2" type="RigidBody3D" parent="LargePileLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileLeft/CubeL2"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileLeft/CubeL2"]
+mesh = SubResource("BoxMesh_large_cyan")
+
+[node name="CubeL3" type="RigidBody3D" parent="LargePileLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileLeft/CubeL3"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileLeft/CubeL3"]
+mesh = SubResource("BoxMesh_large_cyan")
+
+[node name="LargePileRight" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, -2)
+
+[node name="CubeR1" type="RigidBody3D" parent="LargePileRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileRight/CubeR1"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileRight/CubeR1"]
+mesh = SubResource("BoxMesh_large_red")
+
+[node name="CubeR2" type="RigidBody3D" parent="LargePileRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileRight/CubeR2"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileRight/CubeR2"]
+mesh = SubResource("BoxMesh_large_red")
+
+[node name="CubeR3" type="RigidBody3D" parent="LargePileRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileRight/CubeR3"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileRight/CubeR3"]
+mesh = SubResource("BoxMesh_large_red")
+
+[node name="LargePileBack" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.5)
+
+[node name="CubeB1" type="RigidBody3D" parent="LargePileBack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileBack/CubeB1"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileBack/CubeB1"]
+mesh = SubResource("BoxMesh_large_purple")
+
+[node name="CubeB2" type="RigidBody3D" parent="LargePileBack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileBack/CubeB2"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileBack/CubeB2"]
+mesh = SubResource("BoxMesh_large_purple")
+
+[node name="CubeB3" type="RigidBody3D" parent="LargePileBack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.46, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileBack/CubeB3"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileBack/CubeB3"]
+mesh = SubResource("BoxMesh_large_purple")
+
+[node name="CubeB4" type="RigidBody3D" parent="LargePileBack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mass = 2.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LargePileBack/CubeB4"]
+shape = SubResource("BoxShape3D_large_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LargePileBack/CubeB4"]
+mesh = SubResource("BoxMesh_large_purple")
