@@ -6,10 +6,8 @@ extends CharacterBody3D
 @export var kick_force: float = 14.0
 @export var push_force: float = 3.0
 @export var windup_time: float = 0.5
-@export var wind_direction: Vector3 = Vector3(1.0, 0.0, -0.5).normalized()
-@export var wind_strength: float = 4.5
-@export var flutter_strength: float = 3.2
-@export var flutter_frequency: float = 5.5
+@export_group("Motion Inertia")
+@export var movement_inertia_strength: float = 0.25
 
 @export_group("Skirt Physics")
 @export var skirt_stiffness: float = 3.5
@@ -67,6 +65,40 @@ func _configure_skirt_physics() -> void:
 	var secondary := model_node.get_node_or_null("secondary")
 	if not secondary or not "spring_bones" in secondary:
 		return
+
+	# Collect all leg collider groups defined on the model
+	var leg_groups: Array[VRMColliderGroup] = []
+	for sb in secondary.spring_bones:
+		for cg in sb.collider_groups:
+			if not leg_groups.has(cg):
+				leg_groups.append(cg)
+
+	# Expand collider radius to fit leg mesh volume and ensure knee coverage
+	var left_knee_found := false
+	var right_knee_found := false
+	for cg in leg_groups:
+		for c in cg.colliders:
+			c.radius = max(c.radius, 0.11)
+			if c.bone == "LeftLowerLeg":
+				left_knee_found = true
+			elif c.bone == "RightLowerLeg":
+				right_knee_found = true
+
+	if not left_knee_found and len(leg_groups) > 0:
+		var c_left := VRMCollider.new()
+		c_left.bone = "LeftLowerLeg"
+		c_left.radius = 0.10
+		c_left.offset = Vector3(0.0, 0.06, 0.0)
+		leg_groups[0].colliders.append(c_left)
+
+	if not right_knee_found and len(leg_groups) > 1:
+		var c_right := VRMCollider.new()
+		c_right.bone = "RightLowerLeg"
+		c_right.radius = 0.10
+		c_right.offset = Vector3(0.0, 0.06, 0.0)
+		leg_groups[1].colliders.append(c_right)
+
+	# Apply heavy physics and leg colliders to all skirt and coat-skirt spring bones
 	for sb in secondary.spring_bones:
 		var is_skirt: bool = sb.comment.to_lower().contains("skirt")
 		if not is_skirt:
@@ -78,6 +110,11 @@ func _configure_skirt_physics() -> void:
 			sb.stiffness_scale = skirt_stiffness
 			sb.drag_force_scale = skirt_drag
 			sb.gravity_scale = skirt_gravity
+			sb.hit_radius_scale = max(sb.hit_radius_scale, 0.035)
+			if not leg_groups.is_empty():
+				sb.collider_groups = leg_groups.duplicate()
+
+	secondary.colliders_changed = true
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -166,17 +203,13 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Apply environmental wind and movement inertia to hair/skirt (VRM SpringBones)
+	# Apply environmental wind from world and movement inertia to hair/skirt (VRM SpringBones)
 	if model_node:
-		var time_sec := Time.get_ticks_msec() * 0.001
-		var gust := sin(time_sec * 3.0) * 1.0 + sin(time_sec * 7.1) * 0.5
-		var flutter_phase := time_sec * flutter_frequency
-		var flutter_y := (sin(flutter_phase) * 0.7 + sin(flutter_phase * 2.13) * 0.3) * flutter_strength
-		var lateral_flutter := cos(flutter_phase * 0.85) * (flutter_strength * 0.25)
-		var cross_dir := wind_direction.cross(Vector3.UP).normalized()
-		var flutter := Vector3.UP * flutter_y + cross_dir * lateral_flutter
-		var world_wind := wind_direction * (wind_strength + gust) + flutter
-		var effective_wind := world_wind - velocity * 0.25
+		var world_wind := Vector3.ZERO
+		var wind_node = get_tree().get_first_node_in_group(&"wind")
+		if wind_node and wind_node.has_method("get_wind_at"):
+			world_wind = wind_node.get_wind_at(global_position)
+		var effective_wind := world_wind - velocity * movement_inertia_strength
 		var local_wind: Vector3 = model_node.global_transform.basis.inverse() * effective_wind
 		if "springbone_add_force" in model_node:
 			model_node.springbone_add_force = local_wind

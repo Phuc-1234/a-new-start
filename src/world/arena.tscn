@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://bq7vw18k2h7xm"]
 
+[ext_resource type="Script" uid="uid://btpbabs2yf3ye" path="res://src/world/wind_system.gd" id="1_wind"]
+
 [sub_resource type="Environment" id="Environment_main"]
 background_mode = 1
 background_color = Color(0.18, 0.22, 0.28, 1)
@@ -19,32 +21,33 @@ albedo_color = Color(0.9, 0.95, 1, 0.3)
 
 [sub_resource type="BoxMesh" id="BoxMesh_wind"]
 material = SubResource("StandardMaterial3D_wind")
-size = Vector3(0.03, 0.03, 0.5)
+size = Vector3(0.03, 0.5, 0.03)
 
-[node name="Arena" type="Node3D"]
+[node name="Arena" type="Node3D" unique_id=196137517]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1630774936]
 environment = SubResource("Environment_main")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1180136416]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
 shadow_enabled = true
 
-[node name="Floor" type="StaticBody3D" parent="."]
+[node name="Floor" type="StaticBody3D" parent="." unique_id=628620385]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=783306217]
 shape = SubResource("BoxShape3D_floor")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=635635831]
 mesh = SubResource("BoxMesh_floor")
 
-[node name="WindParticles" type="CPUParticles3D" parent="."]
+[node name="WindParticles" type="CPUParticles3D" parent="." unique_id=550547896 groups=["wind"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 amount = 120
 lifetime = 3.5
 preprocess = 3.5
 mesh = SubResource("BoxMesh_wind")
+particle_flag_align_y = true
 emission_shape = 3
 emission_box_extents = Vector3(10, 3, 10)
 direction = Vector3(1, 0, -0.5)
@@ -54,3 +57,5 @@ initial_velocity_min = 5.0
 initial_velocity_max = 8.0
 scale_amount_min = 0.6
 scale_amount_max = 1.4
+script = ExtResource("1_wind")
+wind_strength = 0.0
